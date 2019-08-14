@@ -1,7 +1,16 @@
-class APIResponse:
-    def  jsonResponse(self,result,error,message):
-        response_data = {}
-        response_data['result'] = ''
-        response_data['error'] = True
-        response_data['message'] = ''
-        return  response_data
+import json
+
+
+class JsonSerializable(object):
+    def toJson(self):
+        return json.dumps(self.__dict__)
+
+    def __repr__(self):
+        return self.toJson()
+
+
+class Utility(JsonSerializable):
+    def __init__(self, result = object, error=False, message=''):
+        self.result=result
+        self.error=error
+        self.message=message
