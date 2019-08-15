@@ -20,7 +20,8 @@ class JsonSerializable(object):
 
 
 class Utility(JsonSerializable):
-    def __init__(self, result = object, error=False, message=''):
+    def __init__(self, result = object, error=False, message='',code=200):
         self.result=result
         self.error=error
         self.message=message
+        self.code=code

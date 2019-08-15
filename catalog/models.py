@@ -33,12 +33,13 @@ class UserSerializer(serializers.ModelSerializer):
 
 class VoiceReq(models.Model):
     voice_req_id = models.CharField(primary_key=True,default=generateUUID, max_length=50, unique=True, editable=False)
-    user_id = models.ForeignKey('User', on_delete=models.SET_NULL, null=True)
+    user = models.ForeignKey('User', on_delete=models.SET_NULL, null=True)
     text = models.TextField(null=False, blank=False)
     audio_file_name = models.CharField(max_length=255, null=False, blank=False)
     record_start_time = models.DateTimeField(null=False, blank=False)
     record_end_time = models.DateTimeField(null=False, blank=False)
     created_date = models.DateTimeField(default=datetime.now,null=False, blank=False)
+    record_type = models.SmallIntegerField(max_length=1, null=False, blank=False)
 
     def __str__(self):
         return self.audio_file_name
@@ -49,7 +50,7 @@ class VoiceReq(models.Model):
 
 class ReceiverCaller(models.Model):
     receiver_caller_id = models.CharField(primary_key=True,default=generateUUID, max_length=50, unique=True, editable=False)
-    voice_req_id = models.ForeignKey('VoiceReq', on_delete=models.SET_NULL, null=True)
+    voice_req = models.ForeignKey('VoiceReq', on_delete=models.SET_NULL, null=True)
     caller_phone_no = models.CharField(max_length=15, null=False, blank=False)
     receiver_phone_no = models.CharField(max_length=15, null=False, blank=False)
 
@@ -62,7 +63,7 @@ class ReceiverCaller(models.Model):
 
 class Name(models.Model):
     name_id = models.CharField(primary_key=True, default=generateUUID, max_length=50, unique=True, editable=False)
-    voice_req_id = models.ForeignKey('VoiceReq', on_delete=models.SET_NULL, null=True)
+    voice_req = models.ForeignKey('VoiceReq', on_delete=models.SET_NULL, null=True)
     name = models.CharField(max_length=50, null=False, blank=False)
 
     def __str__(self):
@@ -74,7 +75,7 @@ class Name(models.Model):
 
 class Phone(models.Model):
     phone_id = models.CharField(primary_key=True, default=generateUUID, max_length=50, unique=True,editable=False)
-    voice_req_id = models.ForeignKey('VoiceReq', on_delete=models.SET_NULL, null=True)
+    voice_req = models.ForeignKey('VoiceReq', on_delete=models.SET_NULL, null=True)
     phone = models.CharField(max_length=15, null=False, blank=False)
 
     def __str__(self):
@@ -86,7 +87,7 @@ class Phone(models.Model):
 
 class Email(models.Model):
     email_id = models.CharField(primary_key=True, default=generateUUID, max_length=50, unique=True,editable=False)
-    voice_req_id = models.ForeignKey('VoiceReq', on_delete=models.SET_NULL, null=True)
+    voice_req = models.ForeignKey('VoiceReq', on_delete=models.SET_NULL, null=True)
     email = models.CharField(max_length=50, null=False, blank=False)
 
     def __str__(self):
