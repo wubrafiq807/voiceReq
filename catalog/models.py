@@ -2,7 +2,7 @@ from django.db import models
 from rest_framework import serializers
 #import uuid # Required for unique book instances
 from uuid import uuid4
-
+from datetime import datetime
 
 def generateUUID():
     return str(uuid4())
@@ -36,9 +36,9 @@ class VoiceReq(models.Model):
     user_id = models.ForeignKey('User', on_delete=models.SET_NULL, null=True)
     text = models.TextField(null=False, blank=False)
     audio_file_name = models.CharField(max_length=255, null=False, blank=False)
-    record_start_time = models.DateField(max_length=15, null=False, blank=False)
-    record_end_time = models.DateField(max_length=15, null=False, blank=False)
-    created_date = models.DateField(max_length=15, null=False, blank=False)
+    record_start_time = models.DateTimeField(null=False, blank=False)
+    record_end_time = models.DateTimeField(null=False, blank=False)
+    created_date = models.DateTimeField(default=datetime.now,null=False, blank=False)
 
     def __str__(self):
         return self.audio_file_name

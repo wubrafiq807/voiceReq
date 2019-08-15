@@ -2,7 +2,10 @@
 import json
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
-from catalog.APIResponse import  Utility
+from catalog.APIResponse import Utility
+from catalog.recognizeVoice import *
+from voiceReq.constant import *
+from catalog.CustomSQL import getResultsBySQL
 import uuid
 @csrf_exempt
 def updateDelOrGetSingleVoiceReq(request, num=1):
@@ -56,9 +59,15 @@ def getAllOrSaveSigbleVoiceReq(request):
                 path_upload = 'files/'
                 unique_filename = str(uuid.uuid4())
                 filename = fs.save(path_upload + unique_filename + '.wav', audioFile)
-                uploaded_file_url = fs.url(filename)
-                #jsone = Utility()
-                jsone.result=[uploaded_file_url]
+                text=getAudioToText(BASE_DIR+'/'+filename)
+                names=extract_names(text)
+                emails=extract_email_addresses(text)
+                phones=extract_phone_numbers(text)
+                query_result=getResultsBySQL('SELECT * FROM `voice_req`')
+                print(query_result)
+                result=query_result
+                jsone.result=result
+                print(jsone)
                 jsone.message='Uploaded success'
                 return HttpResponse(jsone.toJson(), content_type="application/json")
             else:
