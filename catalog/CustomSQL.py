@@ -1,6 +1,6 @@
 from django.db import connection
 from collections import namedtuple
-
+from catalog.models import  User
 
 def namedtuplefetchall(cursor):
     "Return all rows from a cursor as a namedtuple"
@@ -28,3 +28,11 @@ def executeSQL(query):
         cursor.execute(query)
         row = cursor.fetchone()
     return row
+
+def checkUserExist(user_id):
+    user=User.objects.raw("SELECT * FROM `user` WHERE user_id='"+user_id+"'")
+    if len(list(user)) > 0:
+        return True
+    else:
+        return False
+
