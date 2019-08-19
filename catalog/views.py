@@ -225,22 +225,52 @@ def signUpOrLoginUser(request):
         jsone.code = 405
         return HttpResponse(jsone.toJson(), content_type="application/json")
 @csrf_exempt
-def updateUser(request):
+def updateUser(request,id=''):
     jsone = Utility()
 
-    if request.method == 'GET':
+    if request.method == 'PUT':
+
+        users=getResultsBySQL("select * from user where user_id='"+id+"'")
+        if len(list(users))<1:
+            jsone.error=True
+            jsone.message="User ID is not found"
+            jsone.result=[]
+            jsone.code = 405
+            return HttpResponse(jsone.toJson(), content_type="application/json")
         email = request.GET.get('email')
-        password = request.GET.get('password')
-        jsone.message = 'The request method ' + request.method + ' is not allowed'
-        jsone.error = True
-        jsone.code = 405
-        return HttpResponse(jsone.toJson(), content_type="application/json")
-    elif request.method == 'POST':
-        email = request.GET.get('email')
-        password = request.GET.get('password')
-        jsone.message = 'The request method ' + request.method + ' is not allowed'
-        jsone.error = True
-        jsone.code = 405
+        name = request.GET.get('name')
+        phone = request.GET.get('phone')
+        if not email is None and len(email)>0:
+            if validate_email(email) == False:
+                jsone.message = 'Invalid email Address'
+                jsone.error = True
+                jsone.code = 405
+                return HttpResponse(jsone.toJson(), content_type="application/json")
+            if len(list(
+                    getResultsBySQL("select * from user where email='" + email + "' and user_id!='" + id + "'"))) > 0:
+                jsone.message = 'Email address already used for another user'
+                jsone.error = True
+                jsone.code = 405
+                return HttpResponse(jsone.toJson(), content_type="application/json")
+
+
+
+        userDB=users[0]
+        if not name is None and len(name) > 0:
+            userDB['name'] = request.GET.get('name')
+
+        password=request.GET.get('password')
+        if not password is None and len(password)>0:
+            userDB['password'] = computeMD5hash(password)
+        if not phone is None and len(phone) > 0:
+            userDB['phone'] = request.GET.get('phone')
+
+        if not email is None and len(email):
+            userDB['email'] = email
+
+        query="UPDATE user SET name='"+userDB['name']+"',email='"+userDB['email']+"',phone='"+userDB['phone']+"',password='"+userDB['password']+"' WHERE user_id='"+id+"'"
+        executeSQL(query)
+        jsone.result=getResultsBySQL("select * from user where user_id='"+id+"'")[0]
         return HttpResponse(jsone.toJson(), content_type="application/json")
     else:
         jsone.message = 'The request method ' + request.method + ' is not allowed'
