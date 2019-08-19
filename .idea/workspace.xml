@@ -2,15 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="a582b7ba-a457-402f-83de-e2826eada18d" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/catalog/BaseManageView.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/catalog/SiteFuntion.py" beforeDir="false" afterPath="$PROJECT_DIR$/catalog/SiteFuntion.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/catalog/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/catalog/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/catalog/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/catalog/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/voiceReq/UtilityClass.py" beforeDir="false" afterPath="$PROJECT_DIR$/voiceReq/UtilityClass.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/voiceReq/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/voiceReq/settings.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/voiceReq/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/voiceReq/urls.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -36,8 +28,8 @@
         <entry file="file://$PROJECT_DIR$/README.md">
           <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
             <state split_layout="SPLIT">
-              <first_editor>
-                <caret column="14" lean-forward="true" selection-start-column="14" selection-end-column="14" />
+              <first_editor relative-caret-position="85">
+                <caret line="5" column="33" selection-start-line="5" selection-start-column="33" selection-end-line="5" selection-end-column="33" />
               </first_editor>
               <second_editor />
             </state>
@@ -456,8 +448,8 @@
     <entry file="file://$PROJECT_DIR$/README.md">
       <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
         <state split_layout="SPLIT">
-          <first_editor>
-            <caret column="14" lean-forward="true" selection-start-column="14" selection-end-column="14" />
+          <first_editor relative-caret-position="85">
+            <caret line="5" column="33" selection-start-line="5" selection-start-column="33" selection-end-line="5" selection-end-column="33" />
           </first_editor>
           <second_editor />
         </state>
