@@ -1,14 +1,13 @@
 
-import json
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from catalog.APIResponse import Utility
 from catalog.recognizeVoice import getAudioToText
 from voiceReq.UtilityClass import *
 from catalog.SiteFuntion import *
-from catalog.CustomSQL import getResultsBySQL, checkUserExist
-
-import uuid
+from catalog.CustomSQL import getResultsBySQL, checkUserExist,executeSQL
+from validate_email import validate_email
+from voiceReq.UtilityClass import *
 @csrf_exempt
 def updateDelOrGetSingleVoiceReq(request, id=''):
     jsone = Utility()
@@ -19,7 +18,7 @@ def updateDelOrGetSingleVoiceReq(request, id=''):
             finalData=results[0]
             finalData['phones']=getResultsBySQL("SELECT * FROM `phone` WHERE voice_req_id='"+id+"'")
             finalData['names'] = getResultsBySQL("SELECT * FROM `name` WHERE voice_req_id='" + id + "'")
-            finalData['email'] = getResultsBySQL("SELECT * FROM `email` WHERE voice_req_id='" + id + "'")
+            finalData['emails'] = getResultsBySQL("SELECT * FROM `email` WHERE voice_req_id='" + id + "'")
 
             if finalData['record_type'] ==2:
                 callerReceiverInfo=getResultsBySQL("SELECT * FROM `receiver_caller` WHERE voice_req_id='"+id+"'")
@@ -30,14 +29,23 @@ def updateDelOrGetSingleVoiceReq(request, id=''):
             jsone.result = finalData
         else:
             jsone.message='No record found in database'
-
+            jsone.result=[]
         return HttpResponse(jsone.toJson(), content_type="application/json")
     elif request.method == 'DELETE':
-        var = 2222
-        response_data = {}
-        response_data['result'] = var
-        response_data['message'] = 'Some error message'
-        return HttpResponse(json.dumps(response_data), content_type="application/json")
+        results=getResultsBySQL("SELECT * FROM `phone` WHERE voice_req_id='"+id+"'")
+        if len(list(results))>0:
+            executeSQL("DELETE FROM `phone` WHERE voice_req_id='" + id + "'")
+            executeSQL("DELETE FROM `name` WHERE voice_req_id='" + id + "'")
+            executeSQL("DELETE FROM `email` WHERE voice_req_id='" + id + "'")
+            executeSQL("DELETE FROM `receiver_caller` WHERE voice_req_id='" + id + "'")
+            executeSQL('DELETE FROM `voice_req` WHERE voice_req_id="' + id + '"')
+            jsone.message = 'Success fully deleted'
+            return HttpResponse(jsone.toJson(), content_type="application/json")
+        else:
+            jsone.message = 'No record in database.That can be delete by the ID'
+            jsone.result=[]
+            return HttpResponse(jsone.toJson(), content_type="application/json")
+
     else:
         jsone.message = 'The request method ' + request.method + ' is not allowed'
         jsone.error = True
@@ -132,3 +140,111 @@ def getAllOrSaveSigbleVoiceReq(request):
         jsone.error = True
         jsone.code = 405
         return HttpResponse(jsone.toJson(), content_type="application/json")
+
+@csrf_exempt
+def signUpOrLoginUser(request):
+    jsone = Utility()
+
+    if request.method == 'GET':
+        email = request.GET.get('email')
+        password = request.GET.get('password')
+        if validate_email(email)==False:
+            jsone.message = 'Invalid meail Address'
+            jsone.error = True
+            jsone.code = 405
+            return HttpResponse(jsone.toJson(), content_type="application/json")
+        if not email or not password:
+            jsone.message = 'email and password parameters can not be empty'
+            jsone.error = True
+            jsone.code = 405
+            return HttpResponse(jsone.toJson(), content_type="application/json")
+        users=getResultsBySQL("SELECT * FROM `user` WHERE email='"+email+"' and password='"+computeMD5hash(password)+"'")
+        jsone.result = users
+        if len(list(users))<1:
+            jsone.error=True
+            jsone.message="record not found"
+        else:
+            jsone.message="login in success"
+
+        return HttpResponse(jsone.toJson(), content_type="application/json")
+
+    elif request.method == 'POST':
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+        login_type = request.POST.get('login_type')
+        type_flag=False
+
+        if not login_type:
+            jsone.code = 503
+            jsone.message = 'You can not keep empty login_type parameters are empty'
+            jsone.result = []
+            return HttpResponse(jsone.toJson(), content_type="application/json")
+        if login_type=='1' or login_type=='2' or login_type=='3' or login_type=='4':
+            type_flag=True
+
+        if type_flag==False:
+            jsone.code = 503
+            jsone.message = 'Invalid value passed into login_type parameter.The valid values are 1,2,3,4'
+            jsone.result = []
+            return HttpResponse(jsone.toJson(), content_type="application/json")
+
+        if (login_type =='1') and (not email or not password):
+            jsone.code = 503
+            jsone.message = 'You can not keep empty email,password parameters are empty'
+            jsone.result = []
+            return HttpResponse(jsone.toJson(), content_type="application/json")
+        if (login_type !='1') and not email:
+            jsone.code = 503
+            jsone.message = 'You can not keep empty email parameters are empty'
+            jsone.result = []
+            return HttpResponse(jsone.toJson(), content_type="application/json")
+
+        if validate_email(email):
+            if len(list(getResultsBySQL("SELECT * FROM `user` WHERE email='" + email + "'"))) > 0:
+                jsone.code = 503
+                jsone.message = 'Email address already exist in the database'
+                jsone.result = []
+                return HttpResponse(jsone.toJson(), content_type="application/json")
+
+            user_id = getUuid()
+            query = "INSERT INTO user SET user_id='" + user_id + "',email='" + email + "', login_type=" + login_type + ""
+            if login_type=='1':
+                query=query+",password='"+computeMD5hash(password)+"'"
+            executeSQL(query)
+            jsone.message = 'Signup success'
+            jsone.result = getResultsBySQL("SELECT * FROM `user` WHERE user_id='" + user_id + "'")[0]
+            return HttpResponse(jsone.toJson(), content_type="application/json")
+        else:
+            jsone.code = 503
+            jsone.message = 'Invalid email address'
+            return HttpResponse(jsone.toJson(), content_type="application/json")
+
+    else:
+        jsone.message = 'The request method ' + request.method + ' is not allowed'
+        jsone.error = True
+        jsone.code = 405
+        return HttpResponse(jsone.toJson(), content_type="application/json")
+@csrf_exempt
+def updateUser(request):
+    jsone = Utility()
+
+    if request.method == 'GET':
+        email = request.GET.get('email')
+        password = request.GET.get('password')
+        jsone.message = 'The request method ' + request.method + ' is not allowed'
+        jsone.error = True
+        jsone.code = 405
+        return HttpResponse(jsone.toJson(), content_type="application/json")
+    elif request.method == 'POST':
+        email = request.GET.get('email')
+        password = request.GET.get('password')
+        jsone.message = 'The request method ' + request.method + ' is not allowed'
+        jsone.error = True
+        jsone.code = 405
+        return HttpResponse(jsone.toJson(), content_type="application/json")
+    else:
+        jsone.message = 'The request method ' + request.method + ' is not allowed'
+        jsone.error = True
+        jsone.code = 405
+        return HttpResponse(jsone.toJson(), content_type="application/json")
+

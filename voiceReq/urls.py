@@ -18,7 +18,9 @@ from django.urls import path
 from catalog import views
 
 urlpatterns = [
-    path('voiceReqs/', views.getAllOrSaveSigbleVoiceReq),
-    path('voiceReqs/<str:id>/', views.updateDelOrGetSingleVoiceReq),
+    path('api-v1/voiceReqs/', views.getAllOrSaveSigbleVoiceReq),
+    path('api-v1/voiceReqs/<str:id>/', views.updateDelOrGetSingleVoiceReq),
+    path('api-v1/users/', views.signUpOrLoginUser),
+    path('api-v1/users/<str:id>/', views.updateUser),
 ]
 

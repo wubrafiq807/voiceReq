@@ -2,7 +2,7 @@ from catalog.CustomSQL import executeSQL
 from catalog.recognizeVoice import extract_phone_numbers, extract_email_addresses,extract_names
 from voiceReq.UtilityClass import getUuid
 import datetime
-
+from validate_email import validate_email
 def processText(record_type,user_id,record_start_time,record_end_time,text,fileName, caller_phone_no='', receiver_phone_no=''):
     names = extract_names(text)
     emails = extract_email_addresses(text)

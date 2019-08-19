@@ -14,6 +14,11 @@ def uploadFile(audioFile):
         responseData = fs.save(path_upload + unique_filename + '.wav', audioFile)
 
     return responseData
+import hashlib
 
+def computeMD5hash(my_string):
+    m = hashlib.md5()
+    m.update(my_string.encode('utf-8'))
+    return m.hexdigest()
 
 
