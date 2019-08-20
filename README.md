@@ -1,5 +1,6 @@
 # voiceReq APP
-##Route for user API
+
+## Route for user API
 
  <code>GET /api-v1/users/</code>  #request url for login ,parameter email ,password ar mandatory
  
@@ -11,7 +12,7 @@
  
  <code>GET /api-v1/users/check/<email_address>/</code>#Request url for checking email address already exist int the system.
   
-  ##Route for voice recognition API
+## Route for voice recognition API
   
  <code>GET /api-v1/voiceReqs/</code> # request url for voice get all recognition list for user.mandatory parameter is user_id
   
