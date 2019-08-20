@@ -22,5 +22,7 @@ urlpatterns = [
     path('api-v1/voiceReqs/<str:id>/', views.updateDelOrGetSingleVoiceReq),
     path('api-v1/users/', views.signUpOrLoginUser),
     path('api-v1/users/<str:id>/', views.updateUser),
+    path('api-v1/users/check/<str:email>', views.checkUser),
+
 ]
 

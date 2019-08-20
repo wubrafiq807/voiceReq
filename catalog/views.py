@@ -8,6 +8,8 @@ from catalog.SiteFuntion import *
 from catalog.CustomSQL import getResultsBySQL, checkUserExist,executeSQL
 from validate_email import validate_email
 from voiceReq.UtilityClass import *
+from rest_framework.decorators import api_view
+@api_view(['DELETE','GET'])
 @csrf_exempt
 def updateDelOrGetSingleVoiceReq(request, id=''):
     jsone = Utility()
@@ -46,12 +48,7 @@ def updateDelOrGetSingleVoiceReq(request, id=''):
             jsone.result=[]
             return HttpResponse(jsone.toJson(), content_type="application/json")
 
-    else:
-        jsone.message = 'The request method ' + request.method + ' is not allowed'
-        jsone.error = True
-        jsone.code = 405
-        return HttpResponse(jsone.toJson(), content_type="application/json")
-
+@api_view(['POST','GET'])
 @csrf_exempt
 def getAllOrSaveSigbleVoiceReq(request):
     jsone = Utility()
@@ -135,12 +132,7 @@ def getAllOrSaveSigbleVoiceReq(request):
                 jsone.code = 503
                 return HttpResponse(jsone.toJson(), content_type="application/json")
 
-    else:
-        jsone.message = 'The request method '+request.method+' is not allowed'
-        jsone.error = True
-        jsone.code = 405
-        return HttpResponse(jsone.toJson(), content_type="application/json")
-
+@api_view(['POST','GET'])
 @csrf_exempt
 def signUpOrLoginUser(request):
     jsone = Utility()
@@ -219,16 +211,15 @@ def signUpOrLoginUser(request):
             jsone.message = 'Invalid email address'
             return HttpResponse(jsone.toJson(), content_type="application/json")
 
-    else:
-        jsone.message = 'The request method ' + request.method + ' is not allowed'
-        jsone.error = True
-        jsone.code = 405
-        return HttpResponse(jsone.toJson(), content_type="application/json")
+
+@api_view(['PUT'])
 @csrf_exempt
 def updateUser(request,id=''):
     jsone = Utility()
 
     if request.method == 'PUT':
+        from django.http import QueryDict
+        put = request.data
 
         users=getResultsBySQL("select * from user where user_id='"+id+"'")
         if len(list(users))<1:
@@ -237,9 +228,12 @@ def updateUser(request,id=''):
             jsone.result=[]
             jsone.code = 405
             return HttpResponse(jsone.toJson(), content_type="application/json")
-        email = request.GET.get('email')
-        name = request.GET.get('name')
-        phone = request.GET.get('phone')
+
+        email = put.get('email')
+        name = put.get('name')
+        phone = put.get('phone')
+        password = put.get('password')
+
         if not email is None and len(email)>0:
             if validate_email(email) == False:
                 jsone.message = 'Invalid email Address'
@@ -253,28 +247,49 @@ def updateUser(request,id=''):
                 jsone.code = 405
                 return HttpResponse(jsone.toJson(), content_type="application/json")
 
-
-
-        userDB=users[0]
+        updateQuery="UPDATE user SET login_type=1 "
         if not name is None and len(name) > 0:
-            userDB['name'] = request.GET.get('name')
+            updateQuery+=",name='"+name+"'"
 
-        password=request.GET.get('password')
         if not password is None and len(password)>0:
-            userDB['password'] = computeMD5hash(password)
+            updateQuery+=",password='"+computeMD5hash(password)+"'"
         if not phone is None and len(phone) > 0:
-            userDB['phone'] = request.GET.get('phone')
+           updateQuery+=",phone='"+phone+"'"
 
         if not email is None and len(email):
-            userDB['email'] = email
-
-        query="UPDATE user SET name='"+userDB['name']+"',email='"+userDB['email']+"',phone='"+userDB['phone']+"',password='"+userDB['password']+"' WHERE user_id='"+id+"'"
-        executeSQL(query)
+            updateQuery+=",email='"+email+"'"
+        updateQuery+=" WHERE user_id='"+id+"'"
+        print(updateQuery)
+        executeSQL(updateQuery)
         jsone.result=getResultsBySQL("select * from user where user_id='"+id+"'")[0]
+        jsone.message="update success"
         return HttpResponse(jsone.toJson(), content_type="application/json")
     else:
         jsone.message = 'The request method ' + request.method + ' is not allowed'
         jsone.error = True
         jsone.code = 405
+        return HttpResponse(jsone.toJson(), content_type="application/json")
+
+
+
+@api_view(['GET'])
+@csrf_exempt
+def checkUser(request,email=''):
+    if request.method == 'GET':
+        jsone = Utility()
+
+        if validate_email(email) == False:
+            jsone.message = 'Invalid email Address'
+            jsone.error = True
+            jsone.code = 405
+            return HttpResponse(jsone.toJson(), content_type="application/json")
+        user=getResultsBySQL("SELECT * FROM `user` WHERE email='" + email + "'")
+        if len(list(user))>0:
+            jsone.result=user
+            jsone.message="Email exist in user"
+
+        else:
+            jsone.result=user
+            jsone.message = "Email not exist in user"
         return HttpResponse(jsone.toJson(), content_type="application/json")
 
