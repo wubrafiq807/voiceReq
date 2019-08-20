@@ -68,6 +68,11 @@ def getAllOrSaveSigbleVoiceReq(request):
 
     elif request.method == 'POST':
         user_id = request.POST.get('user_id')
+        if not user_id:
+            jsone.message = 'User ID must'
+            jsone.error = True
+            jsone.code = 503
+            return HttpResponse(jsone.toJson(), content_type="application/json")
         if checkUserExist(user_id)==False:
            jsone.message = 'User name is invalid'
            jsone.error = True
@@ -151,12 +156,14 @@ def signUpOrLoginUser(request):
             jsone.code = 405
             return HttpResponse(jsone.toJson(), content_type="application/json")
         users=getResultsBySQL("SELECT * FROM `user` WHERE email='"+email+"' and password='"+computeMD5hash(password)+"'")
-        jsone.result = users
+
         if len(list(users))<1:
             jsone.error=True
             jsone.message="record not found"
+            jsone.result = []
         else:
             jsone.message="login in success"
+            jsone.result = users[0]
 
         return HttpResponse(jsone.toJson(), content_type="application/json")
 

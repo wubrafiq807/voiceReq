@@ -11,3 +11,11 @@
  
  <code>GET /api-v1/users/check/<email_address>/</code>#Request url for checking email address already exist int the system.
   
+  ##Route for voice recognition API
+ <code>GET /api-v1/voiceReqs/</code> # request url for voice get all recognition list for user.mandatory parameter is user_id
+  
+ <code>POST /api-v1/voiceReqs/</code># Request url for create voice recognition 
+ 
+ <code>GET /api-v1/voiceReqs/<id>/</code> # Request url for get  recognition by ID 
+ 
+ <code>DELETE /api-v1/voiceReqs/007a1f26-70b8-4364-a3f1-0b324c886ba2/</code> # request url for delete recognition by ID
