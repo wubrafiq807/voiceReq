@@ -39,7 +39,7 @@ class VoiceReq(models.Model):
     record_start_time = models.DateTimeField(null=False, blank=False)
     record_end_time = models.DateTimeField(null=False, blank=False)
     created_date = models.DateTimeField(default=datetime.now,null=False, blank=False)
-    record_type = models.SmallIntegerField(max_length=1, null=False, blank=False)
+    record_type = models.SmallIntegerField( null=False, blank=False)
 
     def __str__(self):
         return self.audio_file_name
@@ -96,5 +96,12 @@ class Email(models.Model):
     class Meta:
         db_table = 'email'
 
+
+class ApiKey(models.Model):
+    api_key = models.CharField(primary_key=True, default=generateUUID, max_length=50, unique=True,editable=False)
+    status = models.SmallIntegerField(null=False, blank=False)
+
+    class Meta:
+        db_table = 'api_key'
 
 

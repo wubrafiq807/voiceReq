@@ -11,6 +11,8 @@
  be updated.
  
  <code>GET /api-v1/users/check/<email_address>/</code>#Request url for checking email address already exist int the system.
+ 
+ <code>POST /api-v1/get-password/users/<email_address></code> #Request url for forget password
   
 ## Route for voice recognition API
   

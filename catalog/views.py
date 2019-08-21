@@ -5,7 +5,7 @@ from catalog.APIResponse import Utility
 from catalog.recognizeVoice import getAudioToText
 from voiceReq.UtilityClass import *
 from catalog.SiteFuntion import *
-from catalog.CustomSQL import getResultsBySQL, checkUserExist,executeSQL
+from catalog.CustomSQL import getResultsBySQL, checkUserExist,executeSQL,apiKeyIsValid
 from validate_email import validate_email
 from voiceReq.UtilityClass import *
 from rest_framework.decorators import api_view
@@ -13,6 +13,8 @@ from rest_framework.decorators import api_view
 @csrf_exempt
 def updateDelOrGetSingleVoiceReq(request, id=''):
     jsone = Utility()
+    if checkApiKey(request) == False:
+        return getInvalidApiKEyError()
     if request.method == 'GET':
         jsone.message = 'Success'
         results=getResultsBySQL('SELECT * FROM `voice_req` WHERE voice_req_id="'+id+'"')
@@ -31,7 +33,7 @@ def updateDelOrGetSingleVoiceReq(request, id=''):
             jsone.result = finalData
         else:
             jsone.message='No record found in database'
-            jsone.result=[]
+            jsone.result=None
         return HttpResponse(jsone.toJson(), content_type="application/json")
     elif request.method == 'DELETE':
         results=getResultsBySQL("SELECT * FROM `phone` WHERE voice_req_id='"+id+"'")
@@ -52,6 +54,8 @@ def updateDelOrGetSingleVoiceReq(request, id=''):
 @csrf_exempt
 def getAllOrSaveSigbleVoiceReq(request):
     jsone = Utility()
+    if checkApiKey(request) == False:
+        return getInvalidApiKEyError()
 
     if request.method == 'GET':
         user_id = request.GET.get('user_id')
@@ -59,6 +63,7 @@ def getAllOrSaveSigbleVoiceReq(request):
             jsone.message = 'You can not keep user_id empty as parameter'
             jsone.error = True
             jsone.code = 503
+            jsone.result = None
             return HttpResponse(jsone.toJson(), content_type="application/json")
         else:
             query = 'SELECT * from voice_req WHERE user_id="' + user_id + '"'
@@ -72,9 +77,10 @@ def getAllOrSaveSigbleVoiceReq(request):
             jsone.message = 'User ID must'
             jsone.error = True
             jsone.code = 503
+            jsone.result = None
             return HttpResponse(jsone.toJson(), content_type="application/json")
         if checkUserExist(user_id)==False:
-           jsone.message = 'User name is invalid'
+           jsone.message = 'User ID is invalid'
            jsone.error = True
            jsone.code = 503
            return HttpResponse(jsone.toJson(), content_type="application/json")
@@ -137,19 +143,28 @@ def getAllOrSaveSigbleVoiceReq(request):
                 jsone.code = 503
                 return HttpResponse(jsone.toJson(), content_type="application/json")
 
+def checkApiKey(request):
+    api_key=request.headers.get('X-Api-Key')
+    apiFlag=False
+    if api_key is not None:
+        if apiKeyIsValid(api_key)==True:
+            apiFlag=True
+
+    return apiFlag
+
 @api_view(['POST','GET'])
 @csrf_exempt
 def signUpOrLoginUser(request):
+
     jsone = Utility()
+    if checkApiKey(request) == False:
+        return getInvalidApiKEyError()
 
     if request.method == 'GET':
         email = request.GET.get('email')
         password = request.GET.get('password')
         if validate_email(email)==False:
-            jsone.message = 'Invalid meail Address'
-            jsone.error = True
-            jsone.code = 405
-            return HttpResponse(jsone.toJson(), content_type="application/json")
+            return getInvalidEmailError()
         if not email or not password:
             jsone.message = 'email and password parameters can not be empty'
             jsone.error = True
@@ -159,8 +174,8 @@ def signUpOrLoginUser(request):
 
         if len(list(users))<1:
             jsone.error=True
-            jsone.message="record not found"
-            jsone.result = []
+            jsone.message="Email or password is invalid"
+            jsone.result = None
         else:
             jsone.message="login in success"
             jsone.result = users[0]
@@ -202,7 +217,8 @@ def signUpOrLoginUser(request):
             if len(list(getResultsBySQL("SELECT * FROM `user` WHERE email='" + email + "'"))) > 0:
                 jsone.code = 503
                 jsone.message = 'Email address already exist in the database'
-                jsone.result = []
+                jsone.error=True
+                jsone.result = None
                 return HttpResponse(jsone.toJson(), content_type="application/json")
 
             user_id = getUuid()
@@ -223,11 +239,11 @@ def signUpOrLoginUser(request):
 @csrf_exempt
 def updateUser(request,id=''):
     jsone = Utility()
+    if checkApiKey(request) == False:
+        return getInvalidApiKEyError()
 
     if request.method == 'PUT':
-        from django.http import QueryDict
         put = request.data
-
         users=getResultsBySQL("select * from user where user_id='"+id+"'")
         if len(list(users))<1:
             jsone.error=True
@@ -243,10 +259,7 @@ def updateUser(request,id=''):
 
         if not email is None and len(email)>0:
             if validate_email(email) == False:
-                jsone.message = 'Invalid email Address'
-                jsone.error = True
-                jsone.code = 405
-                return HttpResponse(jsone.toJson(), content_type="application/json")
+                return getInvalidEmailError()
             if len(list(
                     getResultsBySQL("select * from user where email='" + email + "' and user_id!='" + id + "'"))) > 0:
                 jsone.message = 'Email address already used for another user'
@@ -278,25 +291,50 @@ def updateUser(request,id=''):
         return HttpResponse(jsone.toJson(), content_type="application/json")
 
 
-
 @api_view(['GET'])
 @csrf_exempt
 def checkUser(request,email=''):
-    if request.method == 'GET':
-        jsone = Utility()
+    jsone = Utility()
+    if checkApiKey(request) == False:
+        return getInvalidApiKEyError()
 
+    if request.method == 'GET':
         if validate_email(email) == False:
-            jsone.message = 'Invalid email Address'
-            jsone.error = True
-            jsone.code = 405
-            return HttpResponse(jsone.toJson(), content_type="application/json")
+            return getInvalidEmailError()
         user=getResultsBySQL("SELECT * FROM `user` WHERE email='" + email + "'")
         if len(list(user))>0:
-            jsone.result=user
+            jsone.result=user[0]
             jsone.message="Email exist in user"
 
         else:
-            jsone.result=user
+            jsone.result=None
+            jsone.error=True
+            jsone.message = "Email not exist in user"
+        return HttpResponse(jsone.toJson(), content_type="application/json")
+
+@api_view(['POST'])
+@csrf_exempt
+def getPassword(request,email=''):
+    jsone = Utility()
+    if checkApiKey(request) == False:
+        return getInvalidApiKEyError()
+
+    if request.method == 'POST':
+
+        if validate_email(email) == False:
+            return getInvalidEmailError()
+        user=getResultsBySQL("SELECT * FROM `user` WHERE email='" + email + "'")
+        if len(list(user))>0:
+            autoPassword=getRamdomPassword()
+            updateQuery="update user set password='"+computeMD5hash(autoPassword)+"' where email='"+email+"'"
+            executeSQL(updateQuery)
+            sendPasswordToUserEmail(request,email,autoPassword)
+            user = getResultsBySQL("SELECT * FROM `user` WHERE email='" + email + "'")
+            jsone.result=user[0]
+            jsone.message="New password '"+autoPassword+"' has been sent your email"
+
+        else:
+            jsone.result=None
             jsone.message = "Email not exist in user"
         return HttpResponse(jsone.toJson(), content_type="application/json")
 

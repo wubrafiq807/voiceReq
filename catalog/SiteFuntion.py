@@ -1,8 +1,12 @@
+from sympy.integrals.rubi.utility_function import log
+
 from catalog.CustomSQL import executeSQL
 from catalog.recognizeVoice import extract_phone_numbers, extract_email_addresses,extract_names
 from voiceReq.UtilityClass import getUuid
 import datetime
-from validate_email import validate_email
+from catalog.APIResponse import Utility
+from django.http import HttpResponse
+
 def processText(record_type,user_id,record_start_time,record_end_time,text,fileName, caller_phone_no='', receiver_phone_no=''):
     names = extract_names(text)
     emails = extract_email_addresses(text)
@@ -26,3 +30,41 @@ def processText(record_type,user_id,record_start_time,record_end_time,text,fileN
         executeSQL(query)
 
     return text
+def getRamdomPassword():
+    import random
+
+    s = "abcdefghijklmnopqrstuvwxyz01234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*()?"
+    passlen = 8
+    p = "".join(random.sample(s, passlen))
+    return p
+
+def getInvalidApiKEyError():
+
+    jsone = Utility()
+    jsone.message = 'X-Api-Key is invalid .Please pass a header as key value pairs like X-Api-Key=>"example api key"'
+    jsone.error = True
+    jsone.code = 503
+    jsone.result = None
+    return HttpResponse(jsone.toJson(), content_type="application/json")
+
+def getInvalidEmailError():
+    jsone = Utility()
+    jsone.message = 'Invalid email Address'
+    jsone.error = True
+    jsone.code = 405
+    jsone.result=None
+    return HttpResponse(jsone.toJson(), content_type="application/json")
+
+def sendPasswordToUserEmail(request,toemail, password):
+    from django.core.mail import BadHeaderError, send_mail
+    from voiceReq import settings
+    subject =  'Voice REQ System new password',
+    message = 'You new password is :'+password+''
+    email_from = settings.EMAIL_HOST_USER
+    recipient_list = [toemail]
+    #send_mail(subject, message, email_from, recipient_list, fail_silently=False)
+
+
+
+
+

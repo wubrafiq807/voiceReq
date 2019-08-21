@@ -1,6 +1,6 @@
 from django.db import connection
 from collections import namedtuple
-from catalog.models import  User
+from catalog.models import  User, ApiKey
 
 def namedtuplefetchall(cursor):
     "Return all rows from a cursor as a namedtuple"
@@ -36,3 +36,9 @@ def checkUserExist(user_id):
     else:
         return False
 
+def apiKeyIsValid(api_key):
+    key=ApiKey.objects.raw("SELECT * FROM `api_key` WHERE api_key='"+api_key+"' and status=1")
+    if len(list(key)) > 0:
+        return True
+    else:
+        return False

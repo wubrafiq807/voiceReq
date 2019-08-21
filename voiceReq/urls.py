@@ -23,6 +23,7 @@ urlpatterns = [
     path('api-v1/users/', views.signUpOrLoginUser),
     path('api-v1/users/<str:id>/', views.updateUser),
     path('api-v1/users/check/<str:email>', views.checkUser),
+    path('api-v1/get-password/users/<str:email>', views.getPassword),
 
 ]
 
