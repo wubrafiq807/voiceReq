@@ -39,7 +39,7 @@ Reset Password:
   
 ## Route for voice recognition API
 
-Request url for voice get all recognition list for user
+Get all recognition list for user:
 ---------------------------------------------------------------------------------------
     Request Type: GET
     API: /api-v1/voiceReqs/
@@ -47,17 +47,17 @@ Request url for voice get all recognition list for user
     valid from fromDate is not null and toDate not null and toDate>fromDate.
     
 
-Request url for create voice recognition:
+Create voice recognition:
 -----------------------------------------
     Request Type: POST 
     API: /api-v1/voiceReqs/
 
-Request url for get  recognition by ID:
+Get  recognition by ID:
 -----------------------------------------
     Request Type: GET
     API: /api-v1/voiceReqs/<recogtion_id>
 
-Request url for delete recognition by ID:
+Delete recognition by ID:
 ---------------------------------------------
     Request Type: DELETE
     API: /api-v1/voiceReqs/<recogtion_id>
