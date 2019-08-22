@@ -65,6 +65,17 @@ def sendPasswordToUserEmail(request,toemail, password):
     #send_mail(subject, message, email_from, recipient_list, fail_silently=False)
 
 
+def validateRange(fromDate, toDate):
+    if fromDate is None and toDate is None:
+        return 2
+    if fromDate is not None and toDate is not None:
+        if fromDate>=toDate:
+            return 0
+        if toDate>fromDate:
+            return 1
+    if (fromDate is not None and toDate is None) or (toDate is not None and fromDate is None):
+         return 0
+
 
 
 

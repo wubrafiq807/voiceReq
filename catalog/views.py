@@ -59,6 +59,16 @@ def getAllOrSaveSigbleVoiceReq(request):
 
     if request.method == 'GET':
         user_id = request.GET.get('user_id')
+        fromDate = request.GET.get('fromDate')
+        toDate = request.GET.get('toDate')
+        validateRangeVar=validateRange(fromDate, toDate)
+        if validateRangeVar ==0:
+            jsone.message = 'Invalid date range.Valid range is toDate>fromDate'
+            jsone.error = True
+            jsone.code = 503
+            jsone.result = None
+            return HttpResponse(jsone.toJson(), content_type="application/json")
+
         if not user_id:
             jsone.message = 'You can not keep user_id empty as parameter'
             jsone.error = True
@@ -66,7 +76,11 @@ def getAllOrSaveSigbleVoiceReq(request):
             jsone.result = None
             return HttpResponse(jsone.toJson(), content_type="application/json")
         else:
-            query = 'SELECT * from voice_req WHERE user_id="' + user_id + '"'
+            query = "SELECT * from voice_req WHERE user_id='" + user_id + "'"
+            if validateRangeVar ==1:
+                query+=" and created_date >= '"+fromDate+"' and created_date <= '"+toDate+" 23:59'"
+
+            print(query)
             jsone.result=getResultsBySQL(query)
             jsone.message='success'
             return HttpResponse(jsone.toJson(), content_type="application/json")
@@ -336,5 +350,6 @@ def getPassword(request,email=''):
         else:
             jsone.result=None
             jsone.message = "Email not exist in user"
+            jsone.error=True
         return HttpResponse(jsone.toJson(), content_type="application/json")
 

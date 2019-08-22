@@ -39,9 +39,12 @@ Reset Password:
   
 ## Route for voice recognition API
 
-Request url for voice get all recognition list for user.mandatory parameter is user_id:
+Request url for voice get all recognition list for user
 ---------------------------------------------------------------------------------------
     GET /api-v1/voiceReqs/
+    Note:.mandatory parameter is user_id.Optional parameter fromDate,toDate.
+    valid from fromDate is not null and toDate not null and toDate>fromDate.
+    
 
 Request url for create voice recognition:
 -----------------------------------------
