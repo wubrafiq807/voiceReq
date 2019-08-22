@@ -56,6 +56,8 @@ Create voice recognition:
 -----------------------------------------
     Request Type: POST 
     API: /api-v1/voiceReqs/
+    Note: You can not keep user_id, record_type,audioFile,record_start_time,record_end_time parameters are empty.And also the record_type value only 1 or 2.You can not keep caller_phone_no ,receiver_phone_no parameters are empty ,
+    when  record_type parametr value is  2 .Please remeber phone numbers are no more than 15 charecters.
 
 Get  recognition by ID:
 -----------------------------------------
