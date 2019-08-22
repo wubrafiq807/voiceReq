@@ -41,19 +41,23 @@ Reset Password:
 
 Request url for voice get all recognition list for user
 ---------------------------------------------------------------------------------------
-    GET /api-v1/voiceReqs/
+    Request Type: GET
+    API: /api-v1/voiceReqs/
     Note:.mandatory parameter is user_id.Optional parameter fromDate,toDate.
     valid from fromDate is not null and toDate not null and toDate>fromDate.
     
 
 Request url for create voice recognition:
 -----------------------------------------
-    POST /api-v1/voiceReqs/
+    Request Type: POST 
+    API: /api-v1/voiceReqs/
 
 Request url for get  recognition by ID:
 -----------------------------------------
-    GET /api-v1/voiceReqs/<recogtion_id>
+    Request Type: GET
+    API: /api-v1/voiceReqs/<recogtion_id>
 
 Request url for delete recognition by ID:
 ---------------------------------------------
-    DELETE /api-v1/voiceReqs/<recogtion_id>
+    Request Type: DELETE
+    API: /api-v1/voiceReqs/<recogtion_id>
