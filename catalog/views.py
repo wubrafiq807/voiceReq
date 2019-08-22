@@ -249,7 +249,7 @@ def signUpOrLoginUser(request):
             return HttpResponse(jsone.toJson(), content_type="application/json")
 
 
-@api_view(['PUT'])
+@api_view(['PUT', 'GET'])
 @csrf_exempt
 def updateUser(request,id=''):
     jsone = Utility()
@@ -279,6 +279,7 @@ def updateUser(request,id=''):
                 jsone.message = 'Email address already used for another user'
                 jsone.error = True
                 jsone.code = 405
+                jsone.result=None
                 return HttpResponse(jsone.toJson(), content_type="application/json")
 
         updateQuery="UPDATE user SET login_type=1 "
@@ -298,11 +299,17 @@ def updateUser(request,id=''):
         jsone.result=getResultsBySQL("select * from user where user_id='"+id+"'")[0]
         jsone.message="update success"
         return HttpResponse(jsone.toJson(), content_type="application/json")
-    else:
-        jsone.message = 'The request method ' + request.method + ' is not allowed'
-        jsone.error = True
-        jsone.code = 405
+    if request.method=='GET':
+        user=getResultsBySQL("select * from user where user_id='" + id + "'")
+        if len(list(user))>0:
+            jsone.result = getResultsBySQL("select * from user where user_id='" + id + "'")[0]
+            jsone.message = "result success"
+        else:
+            jsone.result=None
+            jsone.error=False
         return HttpResponse(jsone.toJson(), content_type="application/json")
+
+
 
 
 @api_view(['GET'])
@@ -323,7 +330,7 @@ def checkUser(request,email=''):
         else:
             jsone.result=None
             jsone.error=True
-            jsone.message = "Email not exist in user"
+            jsone.message = "Invalid email"
         return HttpResponse(jsone.toJson(), content_type="application/json")
 
 @api_view(['POST'])
@@ -349,7 +356,7 @@ def getPassword(request,email=''):
 
         else:
             jsone.result=None
-            jsone.message = "Email not exist in user"
+            jsone.message = "Invalid email"
             jsone.error=True
         return HttpResponse(jsone.toJson(), content_type="application/json")
 

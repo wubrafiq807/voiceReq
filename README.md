@@ -32,6 +32,11 @@ User Find By Email:
     Request Type: GET 
     API: /api-v1/users/check/<email_address>
 
+User Find By user_id:
+--------------------------------------------------------------------
+    Request Type: GET 
+    API: /api-v1/users/<user_id>
+    
 Reset Password:
 ----------------------------------
     Request Type: POST 
