@@ -25,7 +25,7 @@ SECRET_KEY = 's^&oz!vz1*zn6+enui8mw)+o%0=coll)y!3&d952#bhme_2f3k'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['192.168.100.74','0.0.2.2']
 
 
 # Application definition
@@ -124,12 +124,6 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
 STATIC_URL = '/static/'
-# Redirect to home URL after login (Default redirects to /accounts/profile/)
-LOGIN_REDIRECT_URL = '/catalog'
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_HOST_USER = 'rafiqul.senior.istvn@gmail.com'
-EMAIL_HOST_PASSWORD = 'wubcse807'
-EMAIL_PORT = 587 # Tried 465 as mentioned in;
-# https://www.digitalocean.com/community/articles/how-to-use-google-s-smtp-server
-EMAIL_USE_TLS = True
+
+EMAIL_BACKEND = 'bandit.backends.smtp.HijackSMTPBackend'
+BANDIT_EMAIL = 'wubcse807@gmail.com'

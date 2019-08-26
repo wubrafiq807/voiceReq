@@ -62,9 +62,9 @@ Create voice recognition:
 Get  recognition by ID:
 -----------------------------------------
     Request Type: GET
-    API: /api-v1/voiceReqs/<recogtion_id>
+    API: /api-v1/voiceReqs/<recogtion_id>/
 
 Delete recognition by ID:
 ---------------------------------------------
     Request Type: DELETE
-    API: /api-v1/voiceReqs/<recogtion_id>
+    API: /api-v1/voiceReqs/<recogtion_id>/

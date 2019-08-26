@@ -36,7 +36,7 @@ def updateDelOrGetSingleVoiceReq(request, id=''):
             jsone.result=None
         return HttpResponse(jsone.toJson(), content_type="application/json")
     elif request.method == 'DELETE':
-        results=getResultsBySQL("SELECT * FROM `phone` WHERE voice_req_id='"+id+"'")
+        results=getResultsBySQL("SELECT * FROM `voice_req` WHERE voice_req_id='"+id+"'")
         if len(list(results))>0:
             executeSQL("DELETE FROM `phone` WHERE voice_req_id='" + id + "'")
             executeSQL("DELETE FROM `name` WHERE voice_req_id='" + id + "'")
@@ -79,9 +79,11 @@ def getAllOrSaveSigbleVoiceReq(request):
             query = "SELECT * from voice_req WHERE user_id='" + user_id + "'"
             if validateRangeVar ==1:
                 query+=" and created_date >= '"+fromDate+"' and created_date <= '"+toDate+" 23:59'"
-
-            print(query)
-            jsone.result=getResultsBySQL(query)
+            query+=" order by created_date desc"
+            recognitionList=getResultsBySQL(query);
+            if len(list(recognitionList))<1:
+                jsone.error=True
+            jsone.result=recognitionList
             jsone.message='success'
             return HttpResponse(jsone.toJson(), content_type="application/json")
 

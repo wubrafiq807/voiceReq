@@ -60,9 +60,9 @@ def sendPasswordToUserEmail(request,toemail, password):
     from voiceReq import settings
     subject =  'Voice REQ System new password',
     message = 'You new password is :'+password+''
-    email_from = settings.EMAIL_HOST_USER
+    email_from = settings.BANDIT_EMAIL
     recipient_list = [toemail]
-    #send_mail(subject, message, email_from, recipient_list, fail_silently=False)
+    send_mail(subject, message, email_from, recipient_list, fail_silently=False)
 
 
 def validateRange(fromDate, toDate):
