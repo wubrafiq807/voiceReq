@@ -36,8 +36,8 @@ class VoiceReq(models.Model):
     user = models.ForeignKey('User', on_delete=models.SET_NULL, null=True)
     text = models.TextField(null=False, blank=False)
     audio_file_name = models.CharField(max_length=255, null=False, blank=False)
-    record_start_time = models.DateTimeField(null=False, blank=False)
-    record_end_time = models.DateTimeField(null=False, blank=False)
+    record_start_time = models.TimeField(null=False, blank=False)
+    record_end_time = models.TimeField(null=False, blank=False)
     created_date = models.DateTimeField(default=datetime.now,null=False, blank=False)
     record_type = models.SmallIntegerField( null=False, blank=False)
 

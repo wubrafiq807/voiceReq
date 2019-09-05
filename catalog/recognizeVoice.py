@@ -35,9 +35,14 @@ def extract_names(document):
                     names.append(' '.join([c[0] for c in chunk]))
     return names
 def getAudioToText(audioPath):
-    file = sr.AudioFile(audioPath)
-    with file as source:
-        r.adjust_for_ambient_noise(source, duration=0.5)
-        audio = r.record(source)
-    text = r.recognize_google(audio)
+    text=""
+    try:
+        file = sr.AudioFile(audioPath)
+        with file as source:
+            r.adjust_for_ambient_noise(source, duration=0.5)
+            audio = r.record(source)
+        text = r.recognize_google(audio)
+    except:
+        text=""
+
     return text

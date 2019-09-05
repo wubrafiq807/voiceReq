@@ -20,9 +20,21 @@ def updateDelOrGetSingleVoiceReq(request, id=''):
         results=getResultsBySQL('SELECT * FROM `voice_req` WHERE voice_req_id="'+id+'"')
         if len(list(results))>0:
             finalData=results[0]
-            finalData['phones']=getResultsBySQL("SELECT * FROM `phone` WHERE voice_req_id='"+id+"'")
-            finalData['names'] = getResultsBySQL("SELECT * FROM `name` WHERE voice_req_id='" + id + "'")
-            finalData['emails'] = getResultsBySQL("SELECT * FROM `email` WHERE voice_req_id='" + id + "'")
+            names=""
+            emails=""
+            phones=""
+            for phone in getResultsBySQL("SELECT * FROM `phone` WHERE voice_req_id='"+id+"'"):
+                phones+=phone['phone']+","
+            for name in getResultsBySQL("SELECT * FROM `name` WHERE voice_req_id='" + id + "'"):
+                names += name['name'] + ","
+            for email in getResultsBySQL("SELECT * FROM `email` WHERE voice_req_id='" + id + "'"):
+                emails += email['email'] + ","
+
+            finalData['phones']=phones
+            finalData['names'] = names
+            finalData['emails'] = emails
+            finalData['caller_phone_no'] = ""
+            finalData['receiver_phone_no'] = ""
 
             if finalData['record_type'] ==2:
                 callerReceiverInfo=getResultsBySQL("SELECT * FROM `receiver_caller` WHERE voice_req_id='"+id+"'")
@@ -34,6 +46,7 @@ def updateDelOrGetSingleVoiceReq(request, id=''):
         else:
             jsone.message='No record found in database'
             jsone.result=None
+            jsone.error=True
         return HttpResponse(jsone.toJson(), content_type="application/json")
     elif request.method == 'DELETE':
         results=getResultsBySQL("SELECT * FROM `voice_req` WHERE voice_req_id='"+id+"'")
@@ -44,10 +57,12 @@ def updateDelOrGetSingleVoiceReq(request, id=''):
             executeSQL("DELETE FROM `receiver_caller` WHERE voice_req_id='" + id + "'")
             executeSQL('DELETE FROM `voice_req` WHERE voice_req_id="' + id + '"')
             jsone.message = 'Success fully deleted'
+            jsone.result=None
             return HttpResponse(jsone.toJson(), content_type="application/json")
         else:
             jsone.message = 'No record in database.That can be delete by the ID'
-            jsone.result=[]
+            jsone.result=None
+            jsone.error=True
             return HttpResponse(jsone.toJson(), content_type="application/json")
 
 @api_view(['POST','GET'])
@@ -122,8 +137,12 @@ def getAllOrSaveSigbleVoiceReq(request):
                         return HttpResponse(jsone.toJson(), content_type="application/json")
                     else:
                         text = getAudioToText(BASE_DIR + '/' + filename)
-                        jsone.result = processText(record_type, user_id, record_start_time, record_end_time, text,
+                        results=processText(record_type, user_id, record_start_time, record_end_time, text,
                                                    filename)
+                        print(results)
+                        if len(list(results))<0:
+                            results=None
+                        jsone.result = results
                         jsone.message = 'Uploaded successfully'
                         return HttpResponse(jsone.toJson(), content_type="application/json")
                 else:
@@ -133,6 +152,7 @@ def getAllOrSaveSigbleVoiceReq(request):
                         jsone.message = 'You can not keep caller_phone_no ,receiver_phone_no parameters are empty when  record type values 2 and no more than 15 cahrecters'
                         jsone.error = True
                         jsone.code = 503
+                        jsone.result=None
                         return HttpResponse(jsone.toJson(), content_type="application/json")
                     else:
                         if len(caller_phone_no) > 15 or len(receiver_phone_no) > 15:
@@ -148,8 +168,13 @@ def getAllOrSaveSigbleVoiceReq(request):
                             return HttpResponse(jsone.toJson(), content_type="application/json")
                         else:
                             text = getAudioToText(BASE_DIR + '/' + filename)
-                            jsone.result = processText(record_type, user_id, record_start_time, record_end_time, text,
+                            results= processText(record_type, user_id, record_start_time, record_end_time, text,
                                                        filename, caller_phone_no, receiver_phone_no)
+                            print(results)
+                            if len(list(results)) < 0:
+                                results = None
+
+                            jsone.result = results
                             jsone.message = 'Uploaded successfully'
                             return HttpResponse(jsone.toJson(), content_type="application/json")
 
@@ -190,7 +215,7 @@ def signUpOrLoginUser(request):
 
         if len(list(users))<1:
             jsone.error=True
-            jsone.message="Email or password is invalid"
+            jsone.message="Email or password are incorrect"
             jsone.result = None
         else:
             jsone.message="login in success"
@@ -203,11 +228,12 @@ def signUpOrLoginUser(request):
         password = request.POST.get('password')
         login_type = request.POST.get('login_type')
         type_flag=False
+        print(login_type)
 
         if not login_type:
             jsone.code = 503
             jsone.message = 'You can not keep empty login_type parameters are empty'
-            jsone.result = []
+            jsone.result = None
             return HttpResponse(jsone.toJson(), content_type="application/json")
         if login_type=='1' or login_type=='2' or login_type=='3' or login_type=='4':
             type_flag=True
@@ -215,18 +241,18 @@ def signUpOrLoginUser(request):
         if type_flag==False:
             jsone.code = 503
             jsone.message = 'Invalid value passed into login_type parameter.The valid values are 1,2,3,4'
-            jsone.result = []
+            jsone.result = None
             return HttpResponse(jsone.toJson(), content_type="application/json")
 
         if (login_type =='1') and (not email or not password):
             jsone.code = 503
             jsone.message = 'You can not keep empty email,password parameters are empty'
-            jsone.result = []
+            jsone.result = None
             return HttpResponse(jsone.toJson(), content_type="application/json")
         if (login_type !='1') and not email:
             jsone.code = 503
             jsone.message = 'You can not keep empty email parameters are empty'
-            jsone.result = []
+            jsone.result = None
             return HttpResponse(jsone.toJson(), content_type="application/json")
 
         if validate_email(email):
@@ -351,7 +377,7 @@ def getPassword(request,email=''):
             autoPassword=getRamdomPassword()
             updateQuery="update user set password='"+computeMD5hash(autoPassword)+"' where email='"+email+"'"
             executeSQL(updateQuery)
-            sendPasswordToUserEmail(request,email,autoPassword)
+            #sendPasswordToUserEmail(request,email,autoPassword)
             user = getResultsBySQL("SELECT * FROM `user` WHERE email='" + email + "'")
             jsone.result=user[0]
             jsone.message="New password '"+autoPassword+"' has been sent your email"
