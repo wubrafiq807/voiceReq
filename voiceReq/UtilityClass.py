@@ -13,7 +13,7 @@ def uploadFile(audioFile):
         path_upload = 'files/'
         unique_filename = getUuid()
         responseData = fs.save(path_upload + unique_filename + '.wav', audioFile)
-        convertDataToWav(path_upload + unique_filename + '.wav',unique_filename)
+        #convertDataToWav('files/70c82f73-f9e6-42c5-94eb-d8053baa197f.wav',"files/70c82f73-f9e6-42c5-94eb-d8053baa197f.wav")
         print(responseData);
 
     return responseData

@@ -35,6 +35,7 @@ def extract_names(document):
                     names.append(' '.join([c[0] for c in chunk]))
     return names
 def getAudioToText(audioPath):
+
     text=""
     try:
         file = sr.AudioFile(audioPath)

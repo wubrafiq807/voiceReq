@@ -65,7 +65,7 @@ def updateDelOrGetSingleVoiceReq(request, id=''):
             jsone.error=True
             return HttpResponse(jsone.toJson(), content_type="application/json")
 
-@api_view(['POST','GET'])
+#@api_view(['POST','GET'])
 @csrf_exempt
 def getAllOrSaveSigbleVoiceReq(request):
     jsone = Utility()
@@ -134,6 +134,7 @@ def getAllOrSaveSigbleVoiceReq(request):
                         jsone.message = 'Only wav audio file is allowed'
                         jsone.error = True
                         jsone.code = 503
+                        jsone.result=None
                         return HttpResponse(jsone.toJson(), content_type="application/json")
                     else:
                         text = getAudioToText(BASE_DIR + '/' + filename)
