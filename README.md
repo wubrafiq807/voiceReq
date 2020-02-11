@@ -2,7 +2,7 @@
 
 Base Url:
 ---------
-    BASE_URL = "http://192.168.100.74:8080/";
+    BASE_URL = "http://You host ip:8080/";
 
 ## Route for user API
 
